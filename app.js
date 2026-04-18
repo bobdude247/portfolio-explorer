@@ -1,4 +1,5 @@
 const GITHUB_USERNAME = "bobdude247";
+const EXCLUDED_REPOS = new Set(["portfolio-explorer"]);
 
 const statusEl = document.getElementById("status");
 const projectsGridEl = document.getElementById("projectsGrid");
@@ -61,6 +62,10 @@ function toProject(repo) {
   };
 }
 
+function isExcludedRepo(repoName) {
+  return EXCLUDED_REPOS.has(String(repoName).toLowerCase());
+}
+
 function renderProjects(projects) {
   projectsGridEl.innerHTML = "";
 
@@ -117,6 +122,7 @@ async function init() {
     const repos = await fetchAllRepos(GITHUB_USERNAME);
 
     allProjects = repos
+      .filter((repo) => !isExcludedRepo(repo.name))
       .map(toProject)
       .filter((project) => Boolean(project.appUrl))
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
